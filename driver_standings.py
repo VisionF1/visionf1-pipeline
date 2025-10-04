@@ -38,6 +38,8 @@ def fetch_driver_standings(ergast: Ergast, season: int = 2025) -> pd.DataFrame:
         raise e
     
 def process_driver_standings(driver_standings: pd.DataFrame) -> pd.DataFrame:
+    logger.info(f"Processing driver standings.")
+
     # Get full name
     driver_standings["driver"] = driver_standings["givenName"] + " " + driver_standings["familyName"]
 
@@ -55,9 +57,13 @@ def process_driver_standings(driver_standings: pd.DataFrame) -> pd.DataFrame:
         "position", "driver", "driverCode", "nationality", "nationalityCode", "team", "teamCode", "points"
     ]].copy()
 
+    logger.info(f"Processed {len(driver_standings_filtered)} driver standings.")
+
     return driver_standings_filtered.to_dict(orient="records")
 
 def prepare_documents(items: List[Dict]) -> List[Dict]:
+    logger.info("Preparing documents for MongoDB upsert.")
+
     now = datetime.now().isoformat() + "Z"
     docs = []
     for item in items:
@@ -67,6 +73,8 @@ def prepare_documents(items: List[Dict]) -> List[Dict]:
     return docs
 
 def upsert_to_mongo(docs: List[Dict]) -> None:
+    logger.info("Upserting documents to MongoDB.")
+    
     if not MONGODB_URI:
         logger.error("MONGODB_URI undefined. Load .env or export the environment variable.")
         return

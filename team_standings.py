@@ -15,7 +15,7 @@ UNIQUE_KEY = "teamCode"
 
 def fetch_team_standings(ergast: Ergast, season: int = 2025) -> pd.DataFrame:
     try:
-        team_standings = ergast.get_constructor_standings(season=2025).content[0]
+        team_standings = ergast.get_constructor_standings(season=season).content[0]
         logger.info(f"Fetched team standings for season {season}.")
         return team_standings
     except Exception as e:

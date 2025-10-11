@@ -15,7 +15,7 @@ UNIQUE_KEY = "id"
 
 def fetch_races(ergast: Ergast, season: int = 2025) -> pd.DataFrame:
     try:
-        races = ergast.get_race_schedule(season=2025)
+        races = ergast.get_race_schedule(season=season)
         logger.info(f"Fetched races for season {season}.")
         return races
     except Exception as e:

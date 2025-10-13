@@ -53,8 +53,8 @@ def process_races(races: pd.DataFrame) -> pd.DataFrame:
         race_datetime = pd.to_datetime(str(upcoming_gp["raceDate"]) + " " + str(upcoming_gp["raceTime"])).tz_localize(None)
         upcoming_gp["endDate"] = race_datetime + pd.Timedelta(hours=3)
         
-        # Create a unique ID for the race
-        upcoming_gp["id"] = f"{upcoming_gp['season']}-{upcoming_gp['round']}"
+        # Create a generic fixed ID so we always update the same document
+        upcoming_gp["id"] = "upcoming-gp"
 
         # Select and rename columns
         upcoming_gp_filtered = upcoming_gp[[

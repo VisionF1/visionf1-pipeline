@@ -1,0 +1,41 @@
+name: VisionF1 Data Pipeline
+
+on:
+  workflow_dispatch: # Allow manual execution from the GitHub UI
+  schedule:
+    - cron: '0 23 * * 0' # Sundays at 23:00 UTC / 20:00 Argentina
+
+jobs:
+  upserts:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Set environment variables
+        run: |
+          echo "MONGODB_DB=${{ secrets.MONGODB_DB }}" >> $GITHUB_ENV
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> $GITHUB_ENV
+
+      - name: Upsert driver_standings
+        run: python driver_standings.py
+
+      - name: Upsert team_standings
+        run: python team_standings.py
+
+      - name: Upsert drivers
+        run: python drivers.py
+
+      - name: Upsert upcoming_gp
+        run: python upcoming_gp.py

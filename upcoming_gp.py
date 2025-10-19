@@ -32,8 +32,10 @@ def process_races(races: pd.DataFrame) -> pd.DataFrame:
 
     # Ergast/Jolpica uses UTC for all datetime values
     now = pd.Timestamp.utcnow().replace(tzinfo=None)
-    # Filter for upcoming GPs based on FP1 date
-    upcoming_gp = races[races["fp1Date"] > now].sort_values("fp1Date")
+    # Filter for upcoming GPs based on race datetime
+    races["raceDateTime"] = pd.to_datetime(races["raceDate"].astype(str) + " " + races["raceTime"].astype(str)) + pd.Timedelta(hours=3)
+    races["raceDateTime"] = races["raceDateTime"].dt.tz_localize(None)
+    upcoming_gp = races[races["raceDateTime"] > now].sort_values("raceDateTime")
 
     # If no upcoming GP is found, create a placeholder for the next season
     if upcoming_gp.empty:

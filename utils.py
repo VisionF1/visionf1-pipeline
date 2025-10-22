@@ -22,7 +22,7 @@ team_code_to_team_name = {
     "aston_martin": "Aston Martin",
     "rb": "Racing Bulls",
     "sauber": "Kick Sauber",
-    "haas": "Haas",
+    "haas": "Haas F1 Team",
 }
 
 nationality_to_country = {

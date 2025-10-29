@@ -4,7 +4,6 @@ import pandas as pd
 import fastf1
 from fastf1.ergast import Ergast
 
-from utils import get_team_names, get_country_codes
 from mongodb_utils import prepare_documents, upsert_to_mongo
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")

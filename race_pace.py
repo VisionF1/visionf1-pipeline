@@ -1,6 +1,7 @@
 import logging
 
 import pandas as pd
+import numpy as np
 import fastf1
 from fastf1 import plotting
 
@@ -83,6 +84,8 @@ def process_race_pace_data(event_data: pd.DataFrame, season: int = 2025) -> pd.D
             })
 
     df_race_pace = pd.DataFrame(all_race_pace)
+
+    df_race_pace = df_race_pace.replace({np.nan: None})
 
     df_race_pace["race_pace_position"] = (
         df_race_pace.groupby(["season", "round"])["avg_laptime"]

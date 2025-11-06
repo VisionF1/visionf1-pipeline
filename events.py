@@ -4,6 +4,7 @@ import pandas as pd
 import fastf1
 from fastf1.ergast import Ergast
 
+from utils import get_country_alpha2_code
 from mongodb_utils import prepare_documents, upsert_to_mongo
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
@@ -35,6 +36,7 @@ def process_event_data(event_data: pd.DataFrame, ergast: Ergast, season: int = 2
         round_number = event["RoundNumber"]
         location = event["Location"]
         country = event["Country"]
+        country_code = get_country_alpha2_code(country)
         event_format = event["EventFormat"]
         event_date = event["EventDate"]
 
@@ -71,6 +73,7 @@ def process_event_data(event_data: pd.DataFrame, ergast: Ergast, season: int = 2
             "event_name": event_name,
             "location": location,
             "country": country,
+            "country_code": country_code,
             "event_date": event_date,
             "event_format": event_format,
             "event_status": event_status,

@@ -511,6 +511,8 @@ country_to_alpha2 = {
     "united kingdom": "GB",
     "united states minor outlying islands": "UM",
     "usa": "US",
+    "united states": "US",
+    "united states of america": "US",
     "uruguay": "UY",
     "uzbekistan": "UZ",
     "vanuatu": "VU",

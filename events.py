@@ -3,6 +3,7 @@ import logging
 import pandas as pd
 import fastf1
 from fastf1.ergast import Ergast
+from datetime import datetime
 
 from utils import get_country_alpha2_code
 from mongodb_utils import prepare_documents, upsert_to_mongo
@@ -13,7 +14,7 @@ logger = logging.getLogger("upsert_events")
 MONGODB_COLLECTION = "events"
 UNIQUE_KEY = "event_id"
 
-SEASON = 2025
+# SEASON = 2025
 
 
 def get_schedule_data(season: int = 2025) -> pd.DataFrame:
@@ -25,9 +26,41 @@ def get_schedule_data(season: int = 2025) -> pd.DataFrame:
     except Exception as e:
         logger.error(f"Error fetching event schedule: {e}")
         raise e
+    
+def get_most_recent_event() -> tuple[pd.Series, int]:
+    current_year = datetime.now().year
+    today = pd.Timestamp.now()
+    
+    # Try current year and previous year
+    for year in [current_year, current_year - 1]:
+        try:
+            schedule = fastf1.get_event_schedule(year)
+            schedule = schedule[schedule["EventFormat"] != "testing"].copy()
+            
+            # Convert EventDate to datetime if not already
+            schedule["EventDate"] = pd.to_datetime(schedule["EventDate"], errors="coerce")
+            
+            # Filter events that have already occurred
+            past_events = schedule[schedule["EventDate"] <= today]
+            
+            if not past_events.empty:
+                # Get the most recent event
+                most_recent_idx = past_events["EventDate"].idxmax()
+                most_recent_event = past_events.loc[most_recent_idx]
+                logger.info(f"Found most recent event: {most_recent_event['EventName']} ({year})")
+                return most_recent_event, year
+        except Exception as e:
+            logger.error(f"Error fetching schedule for {year}: {e}")
+            continue
+    
+    raise ValueError("No past events found in current or previous year")
 
 def process_event_data(event_data: pd.DataFrame, ergast: Ergast, season: int = 2025) -> pd.DataFrame:
     logger.info(f"Processing event data.")
+
+    # Convert Series to DataFrame if it's only one event
+    if isinstance(event_data, pd.Series):
+        event_data = pd.DataFrame([event_data])
 
     all_events = []
     
@@ -101,8 +134,15 @@ def process_event_data(event_data: pd.DataFrame, ergast: Ergast, season: int = 2
 
 def main():
     ergast = Ergast()
-    schedule_data_raw = get_schedule_data(season=SEASON)
-    event_data_processed = process_event_data(schedule_data_raw, ergast, season=SEASON)
+    
+    # Option 1: Process all events of a specific season
+    # schedule_data_raw = get_schedule_data(season=SEASON)
+    # event_data_processed = process_event_data(schedule_data_raw, ergast, season=SEASON)
+    
+    # Option 2: Process only the most recent event
+    most_recent_event, season = get_most_recent_event()
+    event_data_processed = process_event_data(most_recent_event, ergast, season=season)
+
     docs = prepare_documents(event_data_processed)
     upsert_to_mongo(docs, UNIQUE_KEY, MONGODB_COLLECTION)
 

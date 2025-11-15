@@ -39,3 +39,9 @@ jobs:
 
       - name: Upsert upcoming_gp
         run: python upcoming_gp.py
+
+      - name: Upsert events
+        run: python events.py
+
+      - name: Upsert race_pace
+        run: python race_pace.py

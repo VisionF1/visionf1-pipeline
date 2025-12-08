@@ -45,3 +45,6 @@ jobs:
 
       - name: Upsert race_pace
         run: python race_pace.py
+
+      - name: Upsert clean_air_race_pace
+        run: python clean_air_race_pace.py

@@ -48,3 +48,6 @@ jobs:
 
       - name: Upsert clean_air_race_pace
         run: python clean_air_race_pace.py
+
+      - name: Upsert lap_time_distributions
+        run: python lap_time_distributions.py
